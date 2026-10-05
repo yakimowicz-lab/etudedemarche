@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Jeu de rôle – Faire parler le vendeur sur l'étude de marché</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,400;0,500;0,700;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --violet:#8E1F8C; --violet-dark:#6E176C; --violet-soft:#F7EAF5; --violet-line:#C98BC6;
+  --teal:#159E93; --teal-soft:#EAF6F4; --text:#222; --muted:#666; --line:#E3E3E3;
+  --bg:#FFFFFF; --card:#FFFFFF; --warn:#C0392B; --mid:#D98B1C; --ok:#159E93;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px); padding-bottom:env(safe-area-inset-bottom,0px);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --violet:#D27BCF; --violet-dark:#E9A6E6; --violet-soft:#2E1A2D; --violet-line:#7A3F77;
+    --teal:#4FCFC3; --teal-soft:#16302D; --text:#EDEDED; --muted:#A8A8A8; --line:#3A3A3A;
+    --bg:#161616; --card:#1F1F1F;
+  }
+}
+:root[data-theme="dark"]{
+  --violet:#D27BCF; --violet-dark:#E9A6E6; --violet-soft:#2E1A2D; --violet-line:#7A3F77;
+  --teal:#4FCFC3; --teal-soft:#16302D; --text:#EDEDED; --muted:#A8A8A8; --line:#3A3A3A;
+  --bg:#161616; --card:#1F1F1F;
+}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*,*::before,*::after{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:Roboto,"Helvetica Neue",Arial,sans-serif;font-size:15px;line-height:1.45}
+.wrap{max-width:1180px;margin:0 auto;padding:16px 20px 40px}
+.kicker{font-size:12px;color:var(--muted);letter-spacing:.04em}
+h1{color:var(--violet);font-size:24px;margin:4px 0 4px;font-weight:700}
+.sub{color:var(--muted);margin:0 0 14px;max-width:640px}
+.rule{border:1px solid var(--violet);background:var(--violet-soft);color:var(--violet);font-weight:700;padding:12px 16px;border-radius:6px;font-size:14px}
+.tabs{display:flex;gap:8px;flex-wrap:wrap;padding:16px 0;border-bottom:1px solid var(--line);margin-bottom:22px}
+.tab{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:7px 16px;font-weight:500;color:var(--muted);background:var(--card);font-size:14px}
+.tab .n{width:18px;height:18px;border-radius:50%;background:var(--line);color:var(--muted);font-size:11px;display:grid;place-items:center}
+.tab.active{background:var(--violet);border-color:var(--violet);color:#fff}
+.tab.active .n{background:rgba(255,255,255,.3);color:#fff}
+.tab.done{border-color:var(--teal);color:var(--teal)}
+.tab.done .n{background:var(--teal);color:#fff}
+.gauge{display:flex;align-items:center;gap:12px;margin:-8px 0 18px;font-size:13px;color:var(--muted)}
+.gauge .bar{flex:1;max-width:340px;height:8px;background:var(--line);border-radius:4px;overflow:hidden}
+.gauge .fill{height:100%;width:0;background:var(--teal);transition:width .5s ease}
+.step-eyebrow{color:var(--teal);font-style:italic;font-weight:500;font-size:13px}
+h2{font-size:22px;margin:2px 0 16px}
+.grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:20px;align-items:start}
+@media (max-width:860px){.grid{grid-template-columns:1fr}}
+.doc{border:1px solid var(--line);border-top:4px solid var(--violet);border-radius:6px;background:var(--card);padding:20px 22px}
+.doc .label{font-size:12px;color:var(--muted)}
+.doc h3{margin:2px 0 6px;font-size:19px}
+.doc h3::after{content:"";display:block;width:60px;height:3px;background:var(--teal);margin-top:8px}
+.tiles{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:16px 0}
+.tile{background:var(--teal-soft);border-radius:6px;padding:14px 8px;text-align:center}
+.tile b{display:block;color:var(--teal);font-size:21px}
+.tile span{font-size:12.5px}
+.rows{margin-top:6px}
+.rows div{display:flex;justify-content:space-between;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px;font-weight:500}
+.rows div:last-child{border-bottom:none}
+.rows .y{color:var(--teal)}
+.sec{font-size:12.5px;color:var(--muted);margin:14px 0 4px}
+.scroll{overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;font-size:11.5px;color:var(--muted);font-weight:500;padding:6px 6px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:7px 6px;border-bottom:1px solid var(--line);vertical-align:top}
+td.num{white-space:nowrap;font-weight:500}
+.prices{display:grid;grid-template-columns:repeat(3,1fr);gap:0;margin-top:14px;border-radius:6px;overflow:hidden}
+.prices div{background:var(--teal);color:#fff;text-align:center;padding:10px 4px;font-size:12px}
+.prices div:nth-child(2){background:var(--violet)}
+.prices b{display:block;font-size:18px}
+.note{font-size:12.5px;color:var(--muted);margin-top:10px}
+.panel{border:1px solid var(--violet);border-radius:6px;background:var(--violet-soft);padding:18px}
+.panel .ptitle{color:var(--violet);font-weight:700;font-size:12.5px;margin:0 0 10px}
+.panel .ptitle:not(:first-child){margin-top:18px}
+.opt{display:block;width:100%;text-align:left;background:var(--card);border:1px solid var(--line);border-radius:6px;padding:10px 12px;margin-bottom:8px;font:inherit;font-size:13.5px;color:var(--text);cursor:pointer}
+.opt:hover{border-color:var(--violet-line)}
+.opt.sel{border:2px solid var(--violet);padding:9px 11px}
+.opt:disabled{cursor:default}
+.opt:disabled:not(.sel){opacity:.55}
+.opt:focus-visible,.btn:focus-visible{outline:3px solid var(--teal);outline-offset:2px}
+.btn{font:inherit;font-weight:700;border-radius:6px;padding:10px 18px;cursor:pointer;border:1px solid var(--violet);background:var(--violet);color:#fff;font-size:14px}
+.btn.ghost{background:var(--card);color:var(--violet)}
+.btn:disabled{background:var(--line);border-color:var(--line);color:var(--muted);cursor:not-allowed}
+.answer{margin-top:16px;background:var(--card);border:1px solid var(--line);border-left:4px solid var(--teal);border-radius:6px;padding:12px 14px;font-size:14px}
+.answer .who{font-size:12px;color:var(--muted);margin-bottom:4px}
+.answer.lvl0{border-left-color:var(--warn)} .answer.lvl1{border-left-color:var(--mid)}
+.nav{display:flex;justify-content:space-between;margin-top:20px}
+.intro{max-width:760px}
+.intro .doc p{margin:0 0 10px}
+.badge{display:inline-block;font-size:11.5px;font-weight:700;padding:2px 8px;border-radius:999px;color:#fff;white-space:nowrap}
+.b2{background:var(--ok)} .b1{background:var(--mid)} .b0{background:var(--warn)}
+.outcome{border-radius:6px;padding:20px 22px;color:#fff;margin-bottom:20px}
+.outcome h3{margin:0 0 8px;font-size:20px}
+.outcome p{margin:0 0 8px}
+.o0{background:#A93226} .o1{background:#B9741A} .o2{background:#128A80}
+.quote{font-style:italic;background:rgba(255,255,255,.15);padding:10px 12px;border-radius:6px}
+.debrief td{font-size:13px}
+.hidden{display:none}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="kicker">Module 6 – Jeu de rôle</div>
+  <h1>Faire parler le vendeur à chaque page de l'étude de marché</h1>
+  <p class="sub">Présentez chaque partie de l'étude, posez une question, écoutez la réponse. Le vendeur doit arriver seul à sa fourchette de prix.</p>
+  <div id="app"></div>
+</div>
+
+<script>
+const LV = ["Affirmation","Neutre","Facilitante"];
+
+const STEPS = [
+{
+  tab:"Le bien", eyebrow:"1 – Le bien", title:"Repartir de ce qui a déjà été découvert et validé.",
+  doc:`<div class="label">Étude de marché</div><h3>Caractéristiques de votre bien</h3>
+  <div class="tiles">
+   <div class="tile"><b>52 m²</b><span>Surface habitable</span></div>
+   <div class="tile"><b>2</b><span>Pièces (1 chambre)</span></div>
+   <div class="tile"><b>31 m²</b><span>Surface séjour</span></div>
+   <div class="tile"><b>2<sup>e</sup></b><span>Étage</span></div>
+   <div class="tile"><b>5 m²</b><span>Balcon</span></div>
+   <div class="tile"><b>Oui</b><span>Stationnement</span></div>
+  </div>
+  <div class="sec">Équipements</div>
+  <div class="rows">
+   <div><span>Ascenseur</span><span>Non</span></div>
+   <div><span>Terrasse</span><span>Non</span></div>
+   <div><span>Jardin</span><span>Non</span></div>
+   <div><span>Loué</span><span>Non</span></div>
+  </div>
+  <div class="sec">Points forts relevés</div>
+  <div class="rows"><div><span>Emplacement, balcon vue mer, petite copropriété, place de parking</span><span class="y">✓</span></div></div>`,
+  phrases:[
+   {t:"Voici le descriptif de votre appartement, tel que je l'ai relevé lors de la visite.",s:1,w:"Factuel, mais vous présentez seul : le vendeur reste spectateur."},
+   {t:"Avant de parler chiffres, je vous propose de vérifier ensemble qu'on a la même photo de votre appartement.",s:2,w:"Vous l'invitez à co-construire : il valide lui-même la base de l'étude."},
+   {t:"Votre appartement est bien situé, mais il a quelques défauts qu'un acheteur va vite repérer.",s:0,w:"Jugement d'entrée de jeu : le vendeur se met en défense avant même les chiffres."}
+  ],
+  questions:[
+   {t:"Est-ce que ce descriptif vous semble complet ?",s:1,a:"Oui, c'est bien ça.",w:"Question fermée : un « oui » et la conversation s'arrête."},
+   {t:"Vous êtes d'accord que l'absence d'ascenseur fait baisser la valeur ?",s:0,a:"Deux étages, ce n'est rien ! Ça ne change absolument rien au prix.",w:"Affirmation déguisée en question : il défend son bien."},
+   {t:"Selon vous, qu'est-ce qu'un acheteur va regarder en premier en visitant votre appartement ?",s:2,a:"La vue mer depuis le balcon, c'est sûr. Après… il remarquera peut-être qu'il n'y a pas d'ascenseur.",w:"Il se met à la place de l'acheteur et cite lui-même un point faible."}
+  ]
+},
+{
+  tab:"L'estimation en ligne", eyebrow:"2 – L'estimation en ligne", title:"Donner un premier repère, sans en faire une vérité.",
+  doc:`<div class="label">Étude de marché</div><h3>L'estimation en ligne</h3>
+  <div class="sec">Ce que prend en compte l'algorithme</div>
+  <div class="rows">
+   <div><span>Ventes actées (100 % des transactions en France)</span><span class="y">Poids fort</span></div>
+   <div><span>Annonces en ligne sur la zone</span><span class="y">Ajustement</span></div>
+   <div><span>Caractéristiques du bien (époque, état, parties communes…)</span><span class="y">+ / –</span></div>
+  </div>
+  <div class="prices"><div>Prix minimum<b>180 000 €</b></div><div>Prix moyen<b>200 000 €</b></div><div>Prix maximum<b>220 000 €</b></div></div>
+  <p class="note">Soit environ 3 846 €/m² au prix moyen.</p>`,
+  phrases:[
+   {t:"L'algorithme est formel : votre appartement vaut 200 000 €.",s:0,w:"Vous annoncez un prix : exactement ce que la règle interdit."},
+   {t:"Voici ce que donne notre estimation en ligne.",s:1,w:"Neutre, mais sans expliquer d'où vient le chiffre ni son statut."},
+   {t:"Ce premier repère vient d'un algorithme nourri par toutes les ventes réalisées en France. C'est un point de départ, pas une conclusion.",s:2,w:"Vous expliquez la source et désamorcez le rejet : le chiffre devient un repère."}
+  ],
+  questions:[
+   {t:"Que vous inspire cette fourchette par rapport à l'idée que vous aviez en tête ?",s:2,a:"C'est en dessous de ce que j'imaginais… Mais un algorithme ne voit pas la vue mer, non ?",w:"Il exprime l'écart lui-même et ouvre sur ce qui fait (ou non) la valeur."},
+   {t:"Vous voyez bien que 260 000 €, c'est beaucoup trop ?",s:0,a:"Non, je ne vois pas. Ces outils sont toujours à côté de la plaque.",w:"Vous le mettez en tort : il rejette l'outil et vous avec."},
+   {t:"Vous aviez déjà fait une estimation en ligne ?",s:1,a:"Oui, sur un autre site. Ça me donnait plus.",w:"Utile pour savoir d'où vient son chiffre, mais ne le fait pas réfléchir."}
+  ]
+},
+{
+  tab:"Les biens en vente", eyebrow:"3 – Les biens en vente", title:"Montrer ce que les acheteurs voient en même temps que lui.",
+  doc:`<div class="label">Étude de marché</div><h3>L'analyse de la concurrence</h3>
+  <div class="sec">Deux-pièces actuellement en vente à Lacanau (prix affichés)</div>
+  <div class="scroll"><table>
+   <tr><th>Surface</th><th>Prix FAI</th><th>€/m²</th><th>Atouts annoncés</th></tr>
+   <tr><td>41 m²</td><td class="num">199 000 €</td><td class="num">4 854</td><td>Rénové, terrasse vue pins</td></tr>
+   <tr><td>43 m²</td><td class="num">258 000 €</td><td class="num">6 000</td><td>1<sup>re</sup> ligne vue mer, refait à neuf, meublé, box</td></tr>
+   <tr><td>44 m²</td><td class="num">220 348 €</td><td class="num">5 008</td><td>Terrasse + jardin, 2 parkings, récent</td></tr>
+   <tr><td>45 m²</td><td class="num">220 348 €</td><td class="num">4 897</td><td>Terrasse + jardin, 2 parkings</td></tr>
+   <tr><td>47 m²</td><td class="num">194 500 €</td><td class="num">4 138</td><td>Terrasse, parking, proche plages</td></tr>
+  </table></div>
+  <div class="prices"><div>Prix minimum<b>215 176 €</b></div><div>Prix moyen<b>258 908 €</b></div><div>Prix maximum<b>312 000 €</b></div></div>
+  <p class="note">153 annonces en ligne à Lacanau, dont environ 67 deux-pièces. Ce sont des prix demandés, pas des prix de vente.</p>`,
+  phrases:[
+   {t:"Voici la concurrence actuelle sur Lacanau.",s:1,w:"Correct, mais vous ne précisez pas qu'il s'agit de prix affichés."},
+   {t:"Vous voyez, il y a 67 deux-pièces en vente : il va falloir baisser pour sortir du lot.",s:0,w:"Vous tirez la conclusion à sa place : il la refusera."},
+   {t:"Voici les biens que vos futurs acheteurs vont visiter en même temps que le vôtre. Attention, ce sont des prix affichés, pas des prix de vente.",s:2,w:"Vous le placez du côté acheteur et posez la nuance clé pour l'étape suivante."}
+  ],
+  questions:[
+   {t:"Lequel de ces biens ressemble le plus au vôtre ?",s:1,a:"Celui en vue mer à 258 000 €. Donc finalement, je suis dans les clous !",w:"Il choisit le comparable qui l'arrange : la question ne l'oblige pas à se décentrer."},
+   {t:"Si vous étiez acheteur avec 220 000 € de budget, lequel visiteriez-vous en premier, et pourquoi ?",s:2,a:"Celui à 258 000 € fait envie, mais il est refait à neuf, meublé, avec un box… Le mien n'a rien de tout ça. Avec 220 000 €, j'irais peut-être voir celui avec jardin.",w:"Le changement de rôle fait le travail : il compare lui-même les prestations."},
+   {t:"Vous comprenez que vous êtes trop cher face à eux ?",s:0,a:"Je vois surtout qu'un appartement vue mer s'affiche à 258 000 €.",w:"Affirmation frontale : il s'accroche au comparable le plus haut."}
+  ]
+},
+{
+  tab:"Les biens vendus", eyebrow:"4 – Les biens vendus", title:"Passer des prix demandés aux prix réellement payés.",
+  doc:`<div class="label">Étude de marché</div><h3>L'analyse du marché</h3>
+  <div class="sec">Deux-pièces vendus sur le secteur (actes notariés)</div>
+  <div class="scroll"><table>
+   <tr><th>Surface</th><th>Prix</th><th>€/m²</th><th>Date</th></tr>
+   <tr><td>43 m²</td><td class="num">175 680 €</td><td class="num">4 085</td><td>03/2025</td></tr>
+   <tr><td>45 m²</td><td class="num">228 000 €</td><td class="num">5 066</td><td>02/2025</td></tr>
+   <tr><td>41 m²</td><td class="num">190 000 €</td><td class="num">4 634</td><td>04/2024</td></tr>
+   <tr><td>58 m²</td><td class="num">228 000 €</td><td class="num">3 931</td><td>09/2023</td></tr>
+   <tr><td>45 m²</td><td class="num">184 397 €</td><td class="num">4 097</td><td>06/2023</td></tr>
+  </table></div>
+  <div class="sec">Prix du marché au m²</div>
+  <div class="rows">
+   <div><span>Lacanau</span><span>4 185 – 4 650 – 5 115 €</span></div>
+   <div><span>Rue Charles Chaumet</span><span>4 437 – 4 930 – 5 423 €</span></div>
+  </div>
+  <div class="prices"><div>Prix minimum<b>204 142 €</b></div><div>Prix moyen<b>226 824 €</b></div><div>Prix maximum<b>249 506 €</b></div></div>`,
+  phrases:[
+   {t:"Ici, ce ne sont plus des prix demandés : ce sont les prix réellement payés par des acheteurs, chez le notaire.",s:2,w:"Vous créez le contraste avec l'étape précédente sans conclure à sa place."},
+   {t:"Ces chiffres ne mentent pas : vous êtes au-dessus du marché.",s:0,w:"Verdict asséné : vous perdez l'effet de la découverte."},
+   {t:"Voici les dernières ventes de votre secteur.",s:1,w:"Neutre : le vendeur ne perçoit pas forcément la différence avec les annonces."}
+  ],
+  questions:[
+   {t:"Vous admettez qu'aucun deux-pièces ne s'est vendu à 260 000 € ?",s:0,a:"Peut-être, mais le mien a la vue mer. Ce n'est pas comparable.",w:"« Vous admettez » = demande d'aveu. Il se ferme."},
+   {t:"Vous connaissiez ces ventes dans votre quartier ?",s:1,a:"Pas toutes. Celle à 228 000 €, oui : c'est l'appartement d'un voisin.",w:"Crée de la proximité, mais ne l'amène pas à tirer d'enseignement."},
+   {t:"Quelle différence faites-vous entre les prix affichés de tout à l'heure et ces prix de vente réels ?",s:2,a:"Il y a un sacré écart… Les gens affichent haut, mais au final ça se vend plutôt entre 4 500 et 5 000 € le m².",w:"Il formule lui-même la fourchette au m² : la prise de conscience est en marche."}
+  ]
+},
+{
+  tab:"La recommandation", eyebrow:"5 – La recommandation finale", title:"Faire la synthèse et laisser le vendeur conclure.",
+  doc:`<div class="label">Étude de marché</div><h3>Récapitulatif des prix</h3>
+  <div class="scroll"><table>
+   <tr><th>Méthode</th><th>Valeur</th><th>€/m²</th></tr>
+   <tr><td>Estimation en ligne</td><td class="num">200 000 €</td><td class="num">3 846</td></tr>
+   <tr><td>Valeur concurrentielle (prix affichés)</td><td class="num">258 908 €</td><td class="num">4 979</td></tr>
+   <tr><td>Valeur comparative (prix vendus)</td><td class="num">226 824 €</td><td class="num">4 362</td></tr>
+  </table></div>
+  <div class="prices"><div>Surface<b>52 m²</b></div><div>Estimation finale<b>210 – 220 k€</b></div><div>Prix de mise en vente<b>____ €</b></div></div>
+  <p class="note">Le prix de mise en vente reste vide : c'est au vendeur de le proposer.</p>`,
+  phrases:[
+   {t:"Pour vendre, il faut afficher 210 000 €. Sinon, ça ne marchera pas.",s:0,w:"Vous imposez le prix : le vendeur n'a plus rien à décider."},
+   {t:"On a regardé votre bien sous trois angles différents. Je vous propose de faire la synthèse ensemble.",s:2,w:"Vous récapitulez le chemin parcouru et lui rendez la main."},
+   {t:"Voici le récapitulatif des trois méthodes.",s:1,w:"Factuel, mais sans l'inviter à faire lui-même le lien."}
+  ],
+  questions:[
+   {t:"On part sur 215 000 € ?",s:0,a:null,w:"Vous dites le prix : il ne l'a pas choisi, il le subit."},
+   {t:"Au vu de tout ce qu'on a vu, à quel prix pensez-vous qu'un acheteur dirait oui rapidement ?",s:2,a:null,w:"La question clé : il se projette côté acheteur et donne son propre chiffre."},
+   {t:"Vous êtes d'accord pour signer à ce prix-là ?",s:1,a:null,w:"Question fermée qui demande un accord plutôt qu'une réflexion."}
+  ]
+}
+];
+
+const OUTCOMES = [
+ {cls:"o0",title:"Le vendeur campe sur ses positions",
+  quote:"Écoutez, je reste convaincu que mon appartement vaut 260 000 €. Je vais demander l'avis d'une autre agence.",
+  txt:"Trop d'affirmations : le vendeur a passé le rendez-vous à se défendre. Il n'a rien découvert par lui-même, donc il n'a rien changé.",
+  tip:"À retravailler : remplacez chaque phrase qui commence par « Vous voyez que… » ou « Vous êtes d'accord que… » par une question ouverte (Qu'est-ce que… ? Comment… ? Selon vous…?)."},
+ {cls:"o1",title:"Le vendeur reconnaît un peu le marché",
+  quote:"Bon… je comprends qu'on est plus bas que ce que je pensais. On pourrait commencer à 240 000 € et ajuster si ça ne bouge pas ?",
+  txt:"Il a bougé, mais pas jusqu'au bout. Certaines étapes l'ont fait réfléchir, d'autres l'ont laissé spectateur ou sur la défensive.",
+  tip:"Piste : si vous rentrez le mandat à ce prix, fixez avec lui dès maintenant un point d'étape daté (nombre de visites, retours acquéreurs) pour réajuster."},
+ {cls:"o2",title:"Le vendeur accepte les conditions du marché",
+  quote:"Si je résume : ça se vend plutôt autour de 4 500 € le m², et les biens affichés plus haut ne se vendent pas forcément… Pour vendre vite, je dirais entre 215 000 et 220 000 €. On part là-dessus ?",
+  txt:"C'est lui qui a donné le prix. Comme il l'a construit lui-même, il le défendra — et il acceptera plus facilement un ajustement plus tard.",
+  tip:"À retenir : votre posture a fait le travail. Chaque page de l'étude a servi de support à une question, jamais à une démonstration."}
+];
+
+let state;
+function reset(){ state={step:-1,choices:STEPS.map(()=>({p:null,q:null,asked:false}))}; render(); }
+function score(){ return state.choices.reduce((s,c,i)=>s+(c.asked?STEPS[i].phrases[c.p].s+STEPS[i].questions[c.q].s:0),0); }
+function outcomeIdx(){ const s=score(); return s>=16?2:(s>=9?1:0); }
+const app=document.getElementById("app");
+
+function tabs(){
+  return `<div class="tabs">${STEPS.map((s,i)=>{
+    const c=i===state.step?"active":(state.choices[i].asked?"done":"");
+    return `<div class="tab ${c}"><span class="n">${state.choices[i].asked&&i!==state.step?"✓":i+1}</span>${s.tab}</div>`;}).join("")}</div>
+  <div class="gauge">Prise de conscience du vendeur <div class="bar"><div class="fill" style="width:${score()/20*100}%"></div></div></div>`;
+}
+
+function render(){
+  if(state.step===-1) return renderIntro();
+  if(state.step>=STEPS.length) return renderEnd();
+  const S=STEPS[state.step], C=state.choices[state.step];
+  let answer="";
+  if(C.asked){
+    let a=S.questions[C.q].a, lvl=S.questions[C.q].s;
+    if(a===null){ const o=OUTCOMES[outcomeIdx()]; a=o.quote; lvl=outcomeIdx(); }
+    answer=`<div class="answer lvl${lvl}"><div class="who">Le vendeur répond</div>« ${a} »</div>`;
+  }
+  const opts=(arr,key)=>arr.map((o,i)=>`<button class="opt ${C[key]===i?"sel":""}" data-k="${key}" data-i="${i}" ${C.asked?"disabled":""}>${o.t}</button>`).join("");
+  const last=state.step===STEPS.length-1;
+  app.innerHTML=`${tabs()}
+  <div class="step-eyebrow">${S.eyebrow}</div><h2>${S.title}</h2>
+  <div class="grid">
+    <div class="doc">${S.doc}</div>
+    <div class="panel">
+      <p class="ptitle">Votre phrase de présentation</p>${opts(S.phrases,"p")}
+      <p class="ptitle">Votre question au vendeur</p>${opts(S.questions,"q")}
+      ${C.asked?"":`<button class="btn" id="ask" ${C.p===null||C.q===null?"disabled":""}>Poser la question</button>`}
+      ${answer}
+    </div>
+  </div>
+  <div class="nav">
+    <button class="btn ghost" id="prev">← Précédent</button>
+    <button class="btn" id="next" ${C.asked?"":"disabled"}>${last?"Voir le résultat":"Suivant"}</button>
+  </div>`;
+  app.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{C[b.dataset.k]=+b.dataset.i;render();});
+  const ask=document.getElementById("ask"); if(ask) ask.onclick=()=>{C.asked=true;render();};
+  document.getElementById("prev").onclick=()=>{state.step--;render();window.scrollTo(0,0);};
+  document.getElementById("next").onclick=()=>{state.step++;render();window.scrollTo(0,0);};
+}
+
+function renderIntro(){
+  app.innerHTML=`<div class="intro" style="margin-top:22px">
+   <div class="doc">
+    <div class="label">Mise en situation</div><h3>Rendez-vous de restitution de l'étude de marché</h3>
+    <p style="margin-top:14px"><b>Le bien :</b> appartement 2 pièces de 52 m² à Lacanau, 2<sup>e</sup> étage sans ascenseur, balcon vue mer de 5 m², place de parking.</p>
+    <p><b>Le vendeur :</b> M. Dumas. Un voisin lui a dit que « ça part à 5 000 € le m² ici ». Il a 260 000 € en tête.</p>
+    <p><b>Votre mission :</b> présenter les 5 parties de l'étude. À chaque étape, choisissez une phrase de présentation et une question. Le vendeur réagit selon vos choix.</p>
+    <p><b>Votre objectif :</b> qu'il formule lui-même un prix de mise en vente cohérent avec le marché.</p>
+    <p class="note">3 issues possibles : il campe sur ses positions, il reconnaît un peu le marché, ou il accepte les conditions du marché.</p>
+   </div>
+   <div class="nav"><span></span><button class="btn" id="go">Commencer le rendez-vous</button></div></div>`;
+  document.getElementById("go").onclick=()=>{state.step=0;render();};
+}
+
+function renderEnd(){
+  const o=OUTCOMES[outcomeIdx()];
+  const rows=STEPS.map((S,i)=>{const c=state.choices[i],p=S.phrases[c.p],q=S.questions[c.q];
+    return `<tr><td><b>${S.tab}</b></td>
+    <td><span class="badge b${p.s}">${LV[p.s]}</span><br>${p.w}</td>
+    <td><span class="badge b${q.s}">${LV[q.s]}</span><br>${q.w}</td></tr>`;}).join("");
+  app.innerHTML=`${tabs()}
+  <div class="outcome ${o.cls}"><h3>${o.title}</h3>
+   <p class="quote">« ${o.quote} »</p><p>${o.txt}</p><p><b>${o.tip}</b></p>
+   <p style="margin:0;font-size:13px">Score : ${score()} / 20</p></div>
+  <div class="doc debrief"><div class="label">Débrief</div><h3>Vos choix, étape par étape</h3>
+   <div class="scroll" style="margin-top:12px"><table>
+    <tr><th>Étape</th><th>Phrase de présentation</th><th>Question posée</th></tr>${rows}
+   </table></div></div>
+  <div class="nav"><button class="btn ghost" id="back">← Revoir la dernière étape</button><button class="btn" id="again">Rejouer le rendez-vous</button></div>`;
+  document.getElementById("back").onclick=()=>{state.step=STEPS.length-1;render();};
+  document.getElementById("again").onclick=()=>{reset();window.scrollTo(0,0);};
+}
+reset();
+</script>
+</body>
+</html>
